@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 # load categories dataset
 messages = pd.read_csv("messages.csv")
 categories = pd.read_csv("categories.csv")
-categories.head()
 
 # merge datasets
 df = messages.merge(categories, on='id')
