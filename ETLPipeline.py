@@ -2,8 +2,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 # load categories dataset
-messages = pd.read_csv("messages.csv")
-categories = pd.read_csv("categories.csv")
+messages = pd.read_csv("data\messages.csv")
+categories = pd.read_csv("data\categories.csv")
 
 # merge datasets
 df = messages.merge(categories, on='id')
@@ -43,5 +43,5 @@ df = pd.concat([df.reset_index(drop=True),categories.reset_index(drop=True)], ax
 # drop duplicates
 df = df.drop_duplicates()
 
-engine = create_engine('sqlite:///DR.db')
+engine = create_engine('sqlite:///data/DR.db')
 df.to_sql('DR', engine, index=False)
