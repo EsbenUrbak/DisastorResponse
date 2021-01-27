@@ -8,13 +8,11 @@ def load_data(messages_filepath, categories_filepath):
     categories = pd.read_csv(categories_filepath)
     # merge datasets
     df = messages.merge(categories, on="id")
-    df = df.drop_duplicates()
-    df=df.reset_index()
     return df
 
 def clean_data(df):
     # create a dataframe of the 36 individual category columns
-    categories = df["categories"].str.split(";", expand=True)
+    categories = df["categories"].str.split(pat = ";", expand=True)
     # select the first row of the categories dataframe
     row = categories[:1]
     #cleaning up the text to so it can be used as the column names
@@ -31,10 +29,11 @@ def clean_data(df):
         categories[column] =categories[column].astype(int)
     #Replace categories column in df with new category columns.
     df = df.drop('categories',axis = 1)
-    df_merged = pd.concat([df,categories], axis=1)
+    df = pd.concat([df,categories], axis=1)
     #some numbers in "related" has the value 2. so converting these to 1
-    df_merged['related'].replace([2], [1], inplace=True)
-    return df_merged
+    df = df.drop_duplicates()
+    df['related'].replace([2], [1], inplace=True)
+    return df
 
 def save_data(df, database_filename):
     engine = create_engine('sqlite:///data/'+database_filename+".db")

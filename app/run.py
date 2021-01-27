@@ -7,13 +7,6 @@ import pandas as pd
 import re
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-
-import nltk
-nltk.download('punkt')
-nltk.download('wordnet')
-nltk.download('stopwords')
-
 
 from flask import Flask
 from flask import render_template, request, jsonify
@@ -32,7 +25,7 @@ def tokenize(text):
     #splitting the sentence into words:
     tokens = word_tokenize(text)
 
-    #secondly, lemmatize the words if the word is not a "stop word"
+    #secondly, lemmatize the words
     lemmatizer = WordNetLemmatizer()
     clean_tokens = []
     for tok in tokens:
@@ -54,9 +47,14 @@ def tokenize(text):
 # load data
 database_filepath = "DRDB"
 model_filepath = "Model/trained_model.pkl"
+stats = "stats"
 
 engine = create_engine('sqlite:///Data/'+database_filepath+".db")
 df = pd.read_sql_table(table_name=database_filepath,con=engine)
+
+engine = create_engine('sqlite:///Data/'+stats+".db")
+df_stats = pd.read_sql_table(table_name=stats,con=engine)
+
 
 # load model
 model = joblib.load(model_filepath)
@@ -68,12 +66,14 @@ model = joblib.load(model_filepath)
 def index():
 
     # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
+    category_names = df.iloc[:,4:].columns
+    category_bool = (df.iloc[:,4:] != 0).sum().values
+    stats_names = df_stats["category"]
+    stats_bool = df_stats["acccuracy"]
 
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
@@ -90,6 +90,45 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
+                }
+            }
+        },
+        #graph with number of values per category
+        {
+            'data': [
+                Bar(
+                    x= category_names,
+                    y= category_bool
+                )
+            ],
+            'layout': {
+                'title': 'Distribution of Categories across Messages',
+                'yaxis':{
+                    'title':"Count"
+                },
+                'xaxis': {
+                    'title':"Categories"
+
+                }
+            }
+        },
+        #graph showing the accuracy by category_bool
+                #graph with number of values per category
+        {
+            'data': [
+                Bar(
+                    x= stats_names,
+                    y= stats_bool*100
+                )
+            ],
+            'layout': {
+                'title': 'Model Accuracy per category ',
+                'yaxis':{
+                    'title':"Accuracy (%)"
+                },
+                'xaxis': {
+                    'title':"Categories"
+
                 }
             }
         }
