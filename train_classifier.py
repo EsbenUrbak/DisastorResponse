@@ -114,7 +114,7 @@ def main(tune_model = False):
 
     #best model I have found:
     #0.9486767946436139
-    parameters_adaboost = {'clf__estimator__learning_rate': 0.01,'clf__estimator__n_estimators': 40}
+    parameters_adaboost = {'clf__estimator__learning_rate': 0.05,'clf__estimator__n_estimators': 100}
 
     print('Building model...')
     model = build_model()
