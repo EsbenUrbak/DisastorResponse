@@ -6,11 +6,13 @@ When a real disaster happens very large numbers of messages/tweets/facebook stat
 2. **Machine Learning**: Here I tokenize the text and process it using "Count Vectorizer" and "Tfidf" after which I train a Adaboost classifier
 3. **Web development**: Here i setup a webpage where I show some basic graphs about the data and model accuracy. At the same time this webpage can also be used to test the model for any sentence
  
+ 
 ## Libraries
 The project uses Python 3 and the following libraries:
 for process_data.py:
 -   [Pandas](http://pandas.pydata.org/)
 -   [sqlalchemy](https://www.sqlalchemy.org/)
+
 for train_classifier:
 -   [Pandas](http://pandas.pydata.org/)
 -   [sqlalchemy](https://www.sqlalchemy.org/)
@@ -18,16 +20,19 @@ for train_classifier:
 -   [nltk](https://www.nltk.org/)
 -   [scikit-learn](http://scikit-learn.org/stable/)
 -   [Pickle](https://docs.python.org/3/library/pickle.html)
+
 for the webapp:
 -   [Pandas](http://pandas.pydata.org/)
 -   [sqlalchemy](https://www.sqlalchemy.org/)
 -   [Flask](https://flask.palletsprojects.com/en/1.1.x/)
 -   [nltk](https://www.nltk.org/)
 
+
 ## Data
 The dataset is provided by "Figure Eight" and consists of: 
 -   **disaster_categories.csv**: message categories
 -   **disaster_messages.csv**: multilingual disaster response messages
+
 
 ## Instructions:
 To run the full setup locally please do the following:
@@ -48,8 +53,10 @@ The web firstly shows 3 graphs:
 3. The accuracy of the model by catagory
 It also allows the user to test out the model by inputting sentences which it will then categorize by highlighting that category in green.
 
+
 ## Acknowledgements
 Thanks to "Figure Eight" for the dataset.
+
 
 ## Appendix:
 Model stats
