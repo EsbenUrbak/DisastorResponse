@@ -25,22 +25,20 @@ def clean_data(df):
     categories.columns = category_colnames_list_flat
     #Convert category values to just numbers 0 or 1 (example related-1 => 1)
     for column in categories:
-        #First finding the position of - in the text
-        categories['pos'] = categories[column].str.find('-')
-        #Using position to slice the text using a lambda function
-        categories[column] = categories.apply(lambda x: x[column][x['pos']+1:x['pos']+2],axis=1)
-        # convert column from string to numeric
+        #getting last charactor in each string
+        categories[column] = categories[column].str[-1]
+        #converting to integer type
         categories[column] =categories[column].astype(int)
-    #removing the temporary position column
-    categories = categories.drop('pos',1)
     #Replace categories column in df with new category columns.
     df = df.drop('categories',axis = 1)
     df_merged = pd.concat([df,categories], axis=1)
+    #some numbers in "related" has the value 2. so converting these to 1
+    df_merged['related'].replace([2], [1], inplace=True)
     return df_merged
 
 def save_data(df, database_filename):
     engine = create_engine('sqlite:///data/'+database_filename+".db")
-    df.to_sql(database_filename, engine, index=False)
+    df.to_sql(database_filename, engine, index=False, if_exists='replace')
 
 
 def main():

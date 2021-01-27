@@ -4,8 +4,16 @@ import json
 import plotly
 import pandas as pd
 
+import re
 from nltk.stem import WordNetLemmatizer
 from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+
+import nltk
+nltk.download('punkt')
+nltk.download('wordnet')
+nltk.download('stopwords')
+
 
 from flask import Flask
 from flask import render_template, request, jsonify
@@ -18,15 +26,30 @@ from sqlalchemy import create_engine
 app = Flask(__name__)
 
 def tokenize(text):
-    tokens = word_tokenize(text)
-    lemmatizer = WordNetLemmatizer()
+    # normalize case and remove punctuation
+    text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
+    #splitting the sentence into words:
+    tokens = word_tokenize(text)
+
+    #secondly, lemmatize the words if the word is not a "stop word"
+    lemmatizer = WordNetLemmatizer()
     clean_tokens = []
     for tok in tokens:
-        clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+        clean_tok = lemmatizer.lemmatize(tok).strip()
         clean_tokens.append(clean_tok)
 
     return clean_tokens
+
+    # tokens = word_tokenize(text)
+    # lemmatizer = WordNetLemmatizer()
+    #
+    # clean_tokens = []
+    # for tok in tokens:
+    #     clean_tok = lemmatizer.lemmatize(tok).lower().strip()
+    #     clean_tokens.append(clean_tok)
+    #
+    # return clean_tokens
 
 # load data
 database_filepath = "DRDB"

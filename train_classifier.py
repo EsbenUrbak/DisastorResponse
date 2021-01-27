@@ -150,7 +150,7 @@ def main(tune_model = False):
     print('Building model...')
     model = build_model()
     model.set_params(**parameters)
-
+    ######
     print('Training model...')
     if tune_model:
         model = model_tuning_grid(model, X_train, Y_train)
