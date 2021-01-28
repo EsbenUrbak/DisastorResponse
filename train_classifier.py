@@ -31,6 +31,24 @@ import pickle
 
 
 def load_data(database_filepath):
+    """
+    loads the sqlite database and returns the x, y values for analysis and the y columns
+
+    parameters
+    ----------
+        database_filepath: str
+            the file path to the database to be loaded
+
+    Returns
+    -------
+        X: pandas
+            messages from the database
+        Y: pandas
+            the categories in integer format
+        Y.columns: pandas
+            the names of each (panda)
+    """
+
     # load data from database
     engine = db.create_engine('sqlite:///Data/'+database_filepath+".db")
     df = pd.read_sql_table(table_name=database_filepath,con=engine)
@@ -39,7 +57,22 @@ def load_data(database_filepath):
     Y = df.iloc[:, 4:]
     return X, Y, Y.columns
 
+
 def tokenize(text):
+    """
+    converts the sentences into "tokens" while also removnig punctuation, capitals and lemmatizes the words
+
+    parameters
+    ----------
+        text: str
+            text to be tokenized
+
+    Returns
+    -------
+        clean_tokens: List
+            lower lemmatized tokens as a list
+    """
+
     # normalize case and remove punctuation
     text = re.sub(r"[^a-zA-Z0-9]", " ", text.lower())
 
@@ -56,12 +89,44 @@ def tokenize(text):
 
 
 def build_model():
+    """
+    builds a pipeline with Count Vectorizer and TFIDF first and then a Adaboost classifier
+
+    parameters
+    ----------
+
+    Returns
+    -------
+        model: Sklearn pipeline model
+            with Count Vectorizer and TFIDF first and then a Adaboost classifier
+    """
+
     #building the pipeline. Firstly using Count vect and Tfidf to transform the words data into numbers. and then using a Adaboost model.
     model = Pipeline([('vect', CountVectorizer(tokenizer=tokenize)),('tfidf', TfidfTransformer()),('clf', MultiOutputClassifier(AdaBoostClassifier()))])   #RandomForestClassifier(n_jobs=-1)
     return model
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
+    """
+    This evaluations the fit of the inputted model vs the actual.
+
+    parameters
+    ----------
+        model: Sklearn model
+            a sklearn model that has been fittet
+        X_test:
+            The test input values to the model
+        Y_test:
+            The actual values
+        category_names:
+            The names of each category
+
+    Returns
+    -------
+        results: pandas
+            a pandas with stast about the fit of the model on the test data
+    """
+
     #predicting using the model:
     y_pred = model.predict(X_test)
     y_pred_pd = pd.DataFrame.from_records(y_pred)
@@ -80,18 +145,66 @@ def evaluate_model(model, X_test, Y_test, category_names):
     print('Accuracy {}\n\n'.format(average_accuracy/len(Y_test.columns)))
     return results
 
+
 def save_model(model, model_filepath):
+    """
+    This saves the model as a pickle file
+
+    parameters
+    ----------
+        model: Sklearn model
+            a sklearn model that has been fittet
+        model_filepath: str
+            file path to where one wants the model saved
+
+    Returns
+    -------
+    """
+
     # save the model to disk
     filename = model_filepath
     pickle.dump(model, open(filename, 'wb'))
 
+
 def save_data(df, database_filename):
+    """
+    This saves the data to a sqlite database
+
+    parameters
+    ----------
+        df: pandas
+            pandas containing the data to be saved
+        database_filename: str
+            file path to where one wants the data saved
+
+    Returns
+    -------
+    """
     #saving the model stats
     engine = create_engine('sqlite:///data/'+database_filename+".db")
     df.to_sql(database_filename, engine, index=False, if_exists='replace')
 
 
 def model_tuning_grid(model, X_train, Y_train):
+    """
+    This builds a GridSearchCV to find the best hyperparameters.
+
+    parameters
+    ----------
+        model: Sklearn model
+            a sklearn model that has been fittet
+        X_train:
+            The test input values to the model
+        Y_train:
+            The actual/true values
+
+
+    Returns
+    -------
+        cv: Sklearn model
+            a fittet and hyperparameters optimized sklearn model
+    """
+
     #parameters to be turned:
     parameters = {'clf__estimator__learning_rate': [0.01, 0.02, 0.05],
               'clf__estimator__n_estimators': [10, 50,100]}
@@ -105,6 +218,18 @@ def model_tuning_grid(model, X_train, Y_train):
 
 
 def main(tune_model = False):
+    """
+    This runs the training of a model on the database data
+
+    parameters
+    ----------
+        tune_model: Boolean
+            if True then it will do a GridSearchCV to find the best hyperparameters
+    Returns
+    -------
+
+    """
+
     database_filepath = "DRDB"
     model_stats_filepath = "stats"
     model_filepath = "Model/trained_model.pkl"
@@ -119,7 +244,7 @@ def main(tune_model = False):
     print('Building model...')
     model = build_model()
     model.set_params(**parameters_adaboost)
-    ######
+
     print('Training model...')
     if tune_model:
         model = model_tuning_grid(model, X_train, Y_train)
@@ -139,4 +264,4 @@ def main(tune_model = False):
 
 
 if __name__ == '__main__':
-    main(True)
+    main()
