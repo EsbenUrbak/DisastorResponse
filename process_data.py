@@ -4,6 +4,22 @@ from sqlalchemy import create_engine
 
 #loads the data from the csv paths and return the merged data in a panda
 def load_data(messages_filepath, categories_filepath):
+    """
+    loads data from csv files, merged them and return a pandas containing the data
+
+    parameters
+    ----------
+        messages_filepath: str
+            the file path to the messages csv
+        categories_filepath: str
+            the file path to the categories csv
+
+    Returns
+    -------
+        df: pandas
+            panda containing the data
+    """
+
     messages = pd.read_csv(messages_filepath)
     categories = pd.read_csv(categories_filepath)
     # merge datasets
@@ -11,6 +27,20 @@ def load_data(messages_filepath, categories_filepath):
     return df
 
 def clean_data(df):
+    """
+    cleans up the data in the pandas dataframe: converts the table data into integers (0 or 1) and renaming the columns
+
+    parameters
+    ----------
+        df: pandas
+            the pandas with the data to be cleaned
+
+    Returns
+    -------
+        df: pandas
+            panda containing the clean data
+    """
+
     # create a dataframe of the 36 individual category columns
     categories = df["categories"].str.split(pat = ";", expand=True)
     # select the first row of the categories dataframe
@@ -35,12 +65,36 @@ def clean_data(df):
     df['related'].replace([2], [1], inplace=True)
     return df
 
+
 def save_data(df, database_filename):
+    """
+    This saves the data to a sqlite database
+
+    parameters
+    ----------
+        df: pandas
+            pandas containing the data to be saved
+        database_filename: str
+            file path to where one wants the data saved
+
+    Returns
+    -------
+    """
     engine = create_engine('sqlite:///data/'+database_filename+".db")
     df.to_sql(database_filename, engine, index=False, if_exists='replace')
 
 
 def main():
+    """
+    This runs the ETL pipeline
+
+    parameters
+    ----------
+
+    Returns
+    -------
+
+    """
     messages_filepath = "data\messages.csv"
     categories_filepath = "data\categories.csv"
     database_filepath = "DRDB"  #Dissastor Recovery Data Base
